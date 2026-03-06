@@ -71,6 +71,11 @@ func (s *AuthService) Login(email, password string) (string, error) {
 		return "", fmt.Errorf("invalid email or password")
 	}
 
+	err = bcrypt.CompareHashAndPassword([]byte(user.PasswordHash), []byte(password))
+    if err != nil {
+        return "", fmt.Errorf("invalid email or password")
+    }
+
 	claims := jwt.MapClaims{
 		"user_id": user.ID.String(),
 		"role": user.Role,
@@ -97,7 +102,7 @@ func contains(s, substr string) bool {
 }
 
 func containsHelper(s, substr string) bool {
-	for i := 0, i <= len(s)-len(substr); i++ {
+	for i := 0; i <= len(s)-len(substr); i++ {
 		if s[i:i+len(substr)] == substr {
 			return true
 		}

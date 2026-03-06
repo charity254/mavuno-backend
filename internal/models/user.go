@@ -2,6 +2,8 @@ package models
 
 import (
 	//"time"
+	"time"
+
 	"github.com/google/uuid"
 )
 
@@ -12,7 +14,7 @@ type User struct {
 	Role		 string    `json:"role"`
 	FullName	 string    `json:"full_name"`
 	PhoneNumber  string	   `json:"phone_number"`
-	CreatedAt    string    `json:"created_at"`
-	UpdatedAt    string    `json:"updated_at"`
-	IsActive     string    `json:"is_active"` 
+	CreatedAt    time.Time   `json:"created_at"`
+	UpdatedAt    time.Time    `json:"updated_at"`
+	IsActive     bool   `json:"is_active"` 
 }
