@@ -38,6 +38,27 @@ func (h *ProductHandler) CreateProduct(w http.ResponseWriter, r *http.Request) {
 		utils.Error(w, http.StatusUnauthorized, err.Error())
 		return
 	}
+
+	var req createProductRequest
+	if err := json.NewDecoder(r.Body).Decode(&req); err != nil {
+		utils.Error(w, http.StatusBadRequest, "invalid request body")
+		return
+	}
+
+	product, err := h.productService.CreateProduct(farmerID, req.Name, req.UnitType, req.Description)
+	if err != nil {
+		utils.Error(w, http.StatusInternalServerError, err.Error())
+		return 
+	}
+	utils.JSON(w, http.StatusCreated, product)
+}
+
+func (h *ProductHandler) GetProducts(w http.ResponseWriter, r *http.Request) { //handles GET /api/products
+	farmerID, err := getFarmerID(r)
+	if err != nil {
+		utils.Error(w, http.StatusUnauthorized, err.Error())
+		return
+	}
 	products, err := h.productService.GetProductsByFarmer(farmerID)
 	if err != nil {
 		utils.Error(w, http.StatusInternalServerError, err.Error())

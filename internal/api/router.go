@@ -30,7 +30,7 @@ func NewRouter(db *sql.DB, cfg *config.Config) *mux.Router {
 
 	router.HandleFunc("/api/auth/register", authHandler.Register).Methods("POST")
 	router.HandleFunc("/api/auth/login", authHandler.Login).Methods("POST")
-	return router
+	
 
 	 // ── Product Routes ───────────────────────────────────────
 	 productRepo := storage.NewProductRepository(db)
@@ -39,7 +39,7 @@ func NewRouter(db *sql.DB, cfg *config.Config) *mux.Router {
 
 
 	 //AuthMiddleware enforces the required role rule
-	 router.Handle("api/products",
+	 router.Handle("/api/products",
 		middleware.AuthMiddleware(cfg.JWTSecret)(
 			middleware.RequiredRole("farmer")(
 				http.HandlerFunc(productHandler.CreateProduct),
@@ -49,7 +49,7 @@ func NewRouter(db *sql.DB, cfg *config.Config) *mux.Router {
 router.Handle("/api/products",
         middleware.AuthMiddleware(cfg.JWTSecret)(
             middleware.RequiredRole("farmer")(
-                http.HandlerFunc(productHandler.GetProduct),
+                http.HandlerFunc(productHandler.GetProducts),
             ),
         ),
     ).Methods("GET")

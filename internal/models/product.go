@@ -8,10 +8,10 @@ import (
 
 type Product struct {
 	ID 			uuid.UUID `json:"id"`
-	FarmerID	uuid.UUID `json:"farmer_id`
+	FarmerID	uuid.UUID `json:"farmer_id"`
 	Name		string	  `json:"name"`
 	UnitType	string    `json:"unit_type"`
-	Description	string    `json:description`
+	Description	string    `json:"description"`
 	Version		int       `json:"version"`
 	Deleted		bool      `json:"-"`
 	CreatedAt	time.Time `json:"created_at"`

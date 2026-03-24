@@ -18,7 +18,7 @@ func NewProductRepository(db *sql.DB) *ProductRepository {
 
 func (r *ProductRepository) CreateProduct(p *models.Product) error {
 	query := `
-		INSERT INTO products (id, farmer_id, name, unit_type, description, version, deleted, created_at, updated)
+		INSERT INTO products (id, farmer_id, name, unit_type, description, version, deleted, created_at, updated_at)
 		VALUES ($1, $2, $3, $4, $5, $6, $7, $8, $9)
 	`
 	_, err := r.db.Exec(query,
