@@ -7,6 +7,7 @@ import (
 
 	"github.com/gorilla/mux"
 	"github.com/mavuno/mavuno-backend/internal/config"
+	"github.com/mavuno/mavuno-backend/internal/middleware"
 	"github.com/mavuno/mavuno-backend/internal/services"
     "github.com/mavuno/mavuno-backend/internal/storage"
     "github.com/mavuno/mavuno-backend/internal/utils"
@@ -30,4 +31,52 @@ func NewRouter(db *sql.DB, cfg *config.Config) *mux.Router {
 	router.HandleFunc("/api/auth/register", authHandler.Register).Methods("POST")
 	router.HandleFunc("/api/auth/login", authHandler.Login).Methods("POST")
 	return router
+
+	 // ── Product Routes ───────────────────────────────────────
+	 productRepo := storage.NewProductRepository(db)
+	 productService :=services.NewProductService(productRepo)
+	 productHandler := NewProductHandler(productService)
+
+
+	 //AuthMiddleware enforces the required role rule
+	 router.Handle("api/products",
+		middleware.AuthMiddleware(cfg.JWTSecret)(
+			middleware.RequiredRole("farmer")(
+				http.HandlerFunc(productHandler.CreateProduct),
+			),
+		),
+	).Methods("POST")
+router.Handle("/api/products",
+        middleware.AuthMiddleware(cfg.JWTSecret)(
+            middleware.RequiredRole("farmer")(
+                http.HandlerFunc(productHandler.GetProduct),
+            ),
+        ),
+    ).Methods("GET")
+
+    router.Handle("/api/products/{id}",
+        middleware.AuthMiddleware(cfg.JWTSecret)(
+            middleware.RequiredRole("farmer")(
+                http.HandlerFunc(productHandler.GetProduct),
+            ),
+        ),
+    ).Methods("GET")
+
+    router.Handle("/api/products/{id}",
+        middleware.AuthMiddleware(cfg.JWTSecret)(
+            middleware.RequiredRole("farmer")(
+                http.HandlerFunc(productHandler.UpdateProduct),
+            ),
+        ),
+    ).Methods("PUT")
+
+    router.Handle("/api/products/{id}",
+        middleware.AuthMiddleware(cfg.JWTSecret)(
+            middleware.RequiredRole("farmer")(
+                http.HandlerFunc(productHandler.DeleteProduct),
+            ),
+        ),
+    ).Methods("DELETE")
+
+    return router
 }

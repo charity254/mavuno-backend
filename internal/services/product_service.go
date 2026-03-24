@@ -14,7 +14,7 @@ type ProductService struct {
 	productRepo *storage.ProductRepository
 }
 
-func NewProductRepository(productRepo *storage.ProductRepository) *ProductService {
+func NewProductService(productRepo *storage.ProductRepository) *ProductService {
 	return &ProductService{productRepo: productRepo}
 }
 
@@ -46,12 +46,20 @@ func (s *ProductService) CreateProduct(farmerID uuid.UUID, name, unitType, descr
 }
 
 func(s *ProductService) GetProductsByFarmer(farmerID uuid.UUID) ([]*models.Product, error) {
-	products, err := s.productRepo.GetProductByID(id)
+	products, err := s.productRepo.GetProductsByFarmer(farmerID)
+	if err != nil {
+		return nil, fmt.Errorf("product not found")
+	}
+	return products, nil
+}
+
+func(s *ProductService)GetProductByID(id, farmerID uuid.UUID) (*models.Product, error) {
+	product, err := s.productRepo.GetProductByID(id)
 	if err != nil {
 		return nil, fmt.Errorf("product not found")
 	}
 	if product.FarmerID != farmerID {
-		return nil, fmt.Errorf("you do not have permission to access this product")
+	 	return nil, fmt.Errorf("you do not have permission to access this product")
 	}
 	return product, nil
 }

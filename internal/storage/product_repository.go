@@ -25,6 +25,7 @@ func (r *ProductRepository) CreateProduct(p *models.Product) error {
 		p.ID,
 		p.FarmerID,
 		p.Name,
+		p.UnitType,
 		p.Description,
 		p.Version,
 		p.Deleted,
@@ -83,6 +84,7 @@ func (r *ProductRepository) GetProductsByFarmer(farmerID uuid.UUID) ([]*models.P
 		err := rows.Scan(
 			&p.ID,
 			&p.FarmerID,
+			&p.Name,
 			&p.UnitType,
 			&p.Description,
 			&p.Version,
