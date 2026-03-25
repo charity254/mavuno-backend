@@ -87,12 +87,17 @@ func (s *ProductService) UpdateProduct(id, farmerID uuid.UUID, name, unitType, d
 
 	err = s.productRepo.UpdateProductWithVersionCheck(product)
 	if err != nil {
-		if err.Error() == "conflict: product was updated by another session" {
-			return nil, fmt.Errorf("conflict: product  was updated by another session")
-		}
-		return nil, fmt.Errorf("failed to update product: %w", err)
+    	if err.Error() == "conflict: product was updated by another session" {
+        	return nil, fmt.Errorf("conflict: product was updated by another session")
+    }
+    return nil, fmt.Errorf("failed to update product: %w", err)
 	}
-	return product, nil
+	updatedProduct, err := s.productRepo.GetProductByID(id)
+	if err != nil {
+    	return nil, fmt.Errorf("failed to fetch updated product: %w", err)
+}
+
+	return updatedProduct, nil
 }
 
 func (s *ProductService) DeleteProduct(id, farmerID uuid.UUID) error {
