@@ -79,7 +79,7 @@ func (r *ProduceEntryRepository) GetProduceEntryByID(id uuid.UUID) (*models.Prod
 func (r *ProduceEntryRepository) GetEntriesByFarmerAndDateRange(farmerID uuid.UUID, start, end time.Time, productID *uuid.UUID) ([]*models.ProduceEntry, error) { //fetches all entries for a farmer within a date range
 	//qyuery is built dynamically based on whether a product filter is provided
 	query := `
-		SELECT id, farmer_id, product_id, entry_date, opening_stock, added_stock, sold_quantity, rejected_quantity, price_per_unit, noted, version, deleted, created_at, updated_at
+		SELECT id, farmer_id, product_id, entry_date, opening_stock, added_stock, sold_quantity, rejected_quantity, price_per_unit, notes, version, deleted, created_at, updated_at
 		FROM produce_entries
 		WHERE farmer_id = $1 AND deleted = false
 	`

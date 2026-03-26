@@ -77,6 +77,52 @@ router.Handle("/api/products",
             ),
         ),
     ).Methods("DELETE")
+	// ── Entry Routes ─────────────────────────────────────────────
+	// Set up the layers: repository → service → handler
+	entryRepo := storage.NewProduceEntryRepository(db)
+	entryService := services.NewProduceEntryService(entryRepo, productRepo)
+	entryHandler := NewProduceEntryHandler(entryService)
+
+	// All entry routes require a valid JWT token and farmer role
+	router.Handle("/api/entries",
+		middleware.AuthMiddleware(cfg.JWTSecret)(
+			middleware.RequiredRole("farmer")(
+				http.HandlerFunc(entryHandler.CreateEntry),
+			),
+		),
+	).Methods("POST")
+
+	router.Handle("/api/entries",
+		middleware.AuthMiddleware(cfg.JWTSecret)(
+			middleware.RequiredRole("farmer")(
+				http.HandlerFunc(entryHandler.GetEntries),
+			),
+		),
+	).Methods("GET")
+
+	router.Handle("/api/entries/{id}",
+		middleware.AuthMiddleware(cfg.JWTSecret)(
+			middleware.RequiredRole("farmer")(
+				http.HandlerFunc(entryHandler.GetEntry),
+			),
+		),
+	).Methods("GET")
+
+	router.Handle("/api/entries/{id}",
+		middleware.AuthMiddleware(cfg.JWTSecret)(
+			middleware.RequiredRole("farmer")(
+				http.HandlerFunc(entryHandler.UpdateEntry),
+			),
+		),
+	).Methods("PUT")
+
+	router.Handle("/api/entries/{id}",
+		middleware.AuthMiddleware(cfg.JWTSecret)(
+			middleware.RequiredRole("farmer")(
+				http.HandlerFunc(entryHandler.DeleteEntry),
+			),
+		),
+	).Methods("DELETE")
 
     return router
 }
