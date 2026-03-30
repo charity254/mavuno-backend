@@ -25,5 +25,5 @@ type ProduceEntry struct {
 	//computed fields not stored in database. Calculated in the service layer and included in API responses
 	TotalAvailable 		int `json:"total_available"`
 	RemainingStock 		int `json:"remaining_stock"`
-	RevenueGenerated 	int `json:"revenue-generated"`
+	RevenueGenerated 	int `json:"revenue_generated"`
 }

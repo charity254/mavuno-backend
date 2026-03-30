@@ -19,7 +19,7 @@ func NewProduceEntryRepository(db *sql.DB) *ProduceEntryRepository {
 
 func (r *ProduceEntryRepository) CreateProduceEntry(e *models.ProduceEntry) error {
 	query := `
-		INSERT INTO produce_entries (id, farmer_id, product-id, entry_date, opening-stock, added-stock, sold_quantity, rejected_quantity, price_per-unit, notes, version, deleted, created_at, updated_at)
+		INSERT INTO produce_entries (id, farmer_id, product_id, entry_date, opening_stock, added_stock, sold_quantity, rejected_quantity, price_per_unit, notes, version, deleted, created_at, updated_at)
 		VALUES ($1, $2, $3, $4, $5, $6, $7, $8, $9, $10, $11, $12, $13, $14)
 	`
 	_, err := r.db.Exec(query,
@@ -46,7 +46,7 @@ func (r *ProduceEntryRepository) CreateProduceEntry(e *models.ProduceEntry) erro
  
 func (r *ProduceEntryRepository) GetProduceEntryByID(id uuid.UUID) (*models.ProduceEntry, error) {
 	query := `
-		SELECT id, farmer-id, product-id, entry-date, opening_stock, added_stock, sold_quantity, rejected-quantity, price_per_unit, notes, version, deleted, created_at, updated_at
+		SELECT id, farmer_id, product_id, entry_date, opening_stock, added_stock, sold_quantity, rejected_quantity, price_per_unit, notes, version, deleted, created_at, updated_at
 		FROM produce_entries
 		WHERE id = $1 AND deleted = false
 	`
