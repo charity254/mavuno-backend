@@ -46,7 +46,7 @@ func NewRouter(db *sql.DB, cfg *config.Config) *mux.Router {
 			),
 		),
 	).Methods("POST")
-router.Handle("/api/products",
+	router.Handle("/api/products",
         middleware.AuthMiddleware(cfg.JWTSecret)(
             middleware.RequiredRole("farmer")(
                 http.HandlerFunc(productHandler.GetProducts),
@@ -120,6 +120,53 @@ router.Handle("/api/products",
 		middleware.AuthMiddleware(cfg.JWTSecret)(
 			middleware.RequiredRole("farmer")(
 				http.HandlerFunc(entryHandler.DeleteEntry),
+			),
+		),
+	).Methods("DELETE")
+
+	// ── Supply Location Routes ────────────────────────────────────
+	// Set up the layers: repository → service → handler
+	locRepo := storage.NewSupplyLocationRepository(db)
+	locService := services.NewSupplyLocationService(locRepo)
+	locHandler := NewSupplyLocationHandler(locService)
+
+	// All supply location routes require a valid JWT token and farmer role
+	router.Handle("/api/supply-locations",
+		middleware.AuthMiddleware(cfg.JWTSecret)(
+			middleware.RequiredRole("farmer")(
+				http.HandlerFunc(locHandler.CreateSupplyLocation),
+			),
+		),
+	).Methods("POST")
+
+	router.Handle("/api/supply-locations",
+		middleware.AuthMiddleware(cfg.JWTSecret)(
+			middleware.RequiredRole("farmer")(
+				http.HandlerFunc(locHandler.GetSupplyLocations),
+			),
+		),
+	).Methods("GET")
+
+	router.Handle("/api/supply-locations/{id}",
+		middleware.AuthMiddleware(cfg.JWTSecret)(
+			middleware.RequiredRole("farmer")(
+				http.HandlerFunc(locHandler.GetSupplyLocation),
+			),
+		),
+	).Methods("GET")
+
+	router.Handle("/api/supply-locations/{id}",
+		middleware.AuthMiddleware(cfg.JWTSecret)(
+			middleware.RequiredRole("farmer")(
+				http.HandlerFunc(locHandler.UpdateSupplyLocation),
+			),
+		),
+	).Methods("PUT")
+
+	router.Handle("/api/supply-locations/{id}",
+		middleware.AuthMiddleware(cfg.JWTSecret)(
+			middleware.RequiredRole("farmer")(
+				http.HandlerFunc(locHandler.DeleteSupplyLocation),
 			),
 		),
 	).Methods("DELETE")

@@ -29,19 +29,19 @@ func (s *AuthService) Register(email, password, fullName, role string) error {
 	}
 
 	if len(password) < 8 {
-		return fmt.Errorf("Password must be at least 8 characters")
+		return fmt.Errorf("password must be at least 8 characters")
 	}
 
 	if email == "" {
-		return fmt.Errorf("Email is required")
+		return fmt.Errorf("email is required")
 	}
 	if fullName == "" {
-		return fmt.Errorf("Full name is required")
+		return fmt.Errorf("full name is required")
 	}
 
 	hashedPassword, err := bcrypt.GenerateFromPassword([]byte(password), 12)
 	if err != nil {
-		return fmt.Errorf("Failed to hash password: %w", err)
+		return fmt.Errorf("failed to hash password: %w", err)
 	}
 
 	user := &models.User{
