@@ -171,5 +171,61 @@ func NewRouter(db *sql.DB, cfg *config.Config) *mux.Router {
 		),
 	).Methods("DELETE")
 
+	// ── Supply Agreement Routes ───────────────────────────────────
+// Set up the layers: repository → service → handler
+agreementRepo := storage.NewSupplyAgreementRepository(db)
+agreementService := services.NewSupplyAgreementService(agreementRepo, locRepo, productRepo)
+agreementHandler := NewSupplyAgreementHandler(agreementService)
+
+// All supply agreement routes require a valid JWT token and farmer role
+router.Handle("/api/supply-agreements",
+    middleware.AuthMiddleware(cfg.JWTSecret)(
+        middleware.RequiredRole("farmer")(
+            http.HandlerFunc(agreementHandler.CreateSupplyAgreement),
+        ),
+    ),
+).Methods("POST")
+
+router.Handle("/api/supply-agreements",
+    middleware.AuthMiddleware(cfg.JWTSecret)(
+        middleware.RequiredRole("farmer")(
+            http.HandlerFunc(agreementHandler.GetSupplyAgreements),
+        ),
+    ),
+).Methods("GET")
+
+// Active agreements endpoint — used by frontend for dashboard reminders
+router.Handle("/api/supply-agreements/active",
+    middleware.AuthMiddleware(cfg.JWTSecret)(
+        middleware.RequiredRole("farmer")(
+            http.HandlerFunc(agreementHandler.GetActiveSupplyAgreements),
+        ),
+    ),
+).Methods("GET")
+
+router.Handle("/api/supply-agreements/{id}",
+    middleware.AuthMiddleware(cfg.JWTSecret)(
+        middleware.RequiredRole("farmer")(
+            http.HandlerFunc(agreementHandler.GetSupplyAgreement),
+        ),
+    ),
+).Methods("GET")
+
+router.Handle("/api/supply-agreements/{id}",
+    middleware.AuthMiddleware(cfg.JWTSecret)(
+        middleware.RequiredRole("farmer")(
+            http.HandlerFunc(agreementHandler.UpdateSupplyAgreement),
+        ),
+    ),
+).Methods("PUT")
+
+router.Handle("/api/supply-agreements/{id}",
+    middleware.AuthMiddleware(cfg.JWTSecret)(
+        middleware.RequiredRole("farmer")(
+            http.HandlerFunc(agreementHandler.DeleteSupplyAgreement),
+        ),
+    ),
+).Methods("DELETE")
+
     return router
 }
