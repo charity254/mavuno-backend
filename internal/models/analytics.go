@@ -38,3 +38,10 @@ type PlannedVsActualPoint struct {
 	ActualSold       int    `json:"actual_sold"`
 	Difference       int    `json:"difference"` // actual - planned
 }
+
+type TodaySummary struct {
+    TotalAvailable float64
+    TotalSold      float64
+    TotalRevenue   float64
+    TotalRejected  float64
+}
