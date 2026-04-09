@@ -227,5 +227,58 @@ router.Handle("/api/supply-agreements/{id}",
     ),
 ).Methods("DELETE")
 
+// ── Analytics Routes ──────────────────────────────────────────
+analyticsRepo := storage.NewAnalyticsRepository(db)
+analyticsService := services.NewAnalyticsService(analyticsRepo)
+analyticsHandler := NewAnalyticsHandler(analyticsService)
+
+router.Handle("/api/analytics/today",
+    middleware.AuthMiddleware(cfg.JWTSecret)(
+        middleware.RequiredRole("farmer")(
+            http.HandlerFunc(analyticsHandler.GetTodaySummary),
+        ),
+    ),
+).Methods("GET")
+
+router.Handle("/api/analytics/revenue",
+    middleware.AuthMiddleware(cfg.JWTSecret)(
+        middleware.RequiredRole("farmer")(
+            http.HandlerFunc(analyticsHandler.GetRevenueTrend),
+        ),
+    ),
+).Methods("GET")
+
+router.Handle("/api/analytics/stock",
+    middleware.AuthMiddleware(cfg.JWTSecret)(
+        middleware.RequiredRole("farmer")(
+            http.HandlerFunc(analyticsHandler.GetStockTrend),
+        ),
+    ),
+).Methods("GET")
+
+router.Handle("/api/analytics/rejected",
+    middleware.AuthMiddleware(cfg.JWTSecret)(
+        middleware.RequiredRole("farmer")(
+            http.HandlerFunc(analyticsHandler.GetRejectionTrend),
+        ),
+    ),
+).Methods("GET")
+
+router.Handle("/api/analytics/product-summary",
+    middleware.AuthMiddleware(cfg.JWTSecret)(
+        middleware.RequiredRole("farmer")(
+            http.HandlerFunc(analyticsHandler.GetProductSummary),
+        ),
+    ),
+).Methods("GET")
+
+router.Handle("/api/analytics/planned-vs-actual",
+    middleware.AuthMiddleware(cfg.JWTSecret)(
+        middleware.RequiredRole("farmer")(
+            http.HandlerFunc(analyticsHandler.GetPlannedVsActual),
+        ),
+    ),
+).Methods("GET")
+
     return router
 }

@@ -13,6 +13,10 @@ type AnalyticsRepository struct { //read only — no inserts or updates.
 	db *sql.DB
 }
 
+func NewAnalyticsRepository(db *sql.DB) *AnalyticsRepository {
+    return &AnalyticsRepository{db: db}
+}
+
 func (r *AnalyticsRepository) GetRevenueTrend(farmerID uuid.UUID, start, end time.Time) ([]models.RevenuePoint, error) {
 	query := `
 		SELECT 
