@@ -280,5 +280,28 @@ router.Handle("/api/analytics/planned-vs-actual",
     ),
 ).Methods("GET")
 
-    return router
+    
+
+// ── Report Routes ─────────────────────────────────────────────
+reportService := services.NewReportService(entryRepo, productRepo)
+reportHandler := NewReportHandler(reportService)
+
+router.Handle("/api/reports/export",
+    middleware.AuthMiddleware(cfg.JWTSecret)(
+        middleware.RequiredRole("farmer")(
+            http.HandlerFunc(reportHandler.GetReport),
+        ),
+    ),
+).Methods("GET")
+
+router.Handle("/api/reports/download",
+    middleware.AuthMiddleware(cfg.JWTSecret)(
+        middleware.RequiredRole("farmer")(
+            http.HandlerFunc(reportHandler.DownloadCSV),
+        ),
+    ),
+).Methods("GET")
+
+return router
 }
+
