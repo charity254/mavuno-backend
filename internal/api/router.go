@@ -77,7 +77,7 @@ func NewRouter(db *sql.DB, cfg *config.Config) *mux.Router {
             ),
         ),
     ).Methods("DELETE")
-	// ── Entry Routes ─────────────────────────────────────────────
+	// ── Product Entry Routes ─────────────────────────────────────────────
 	// Set up the layers: repository → service → handler
 	entryRepo := storage.NewProduceEntryRepository(db)
 	entryService := services.NewProduceEntryService(entryRepo, productRepo)
@@ -299,6 +299,64 @@ router.Handle("/api/reports/download",
         middleware.RequiredRole("farmer")(
             http.HandlerFunc(reportHandler.DownloadCSV),
         ),
+    ),
+).Methods("GET")
+// ── Marketplace Routes ────────────────────────────────────────
+listingRepo := storage.NewListingRepository(db)
+listingService := services.NewListingService(listingRepo)
+listingHandler := NewListingHandler(listingService)
+
+messageRepo := storage.NewMessageRepository(db)
+messageService := services.NewMessageService(messageRepo, listingRepo)
+messageHandler := NewMessageHandler(messageService)
+
+// Listings — farmers can create, all authenticated users can view
+router.Handle("/api/listings",
+    middleware.AuthMiddleware(cfg.JWTSecret)(
+        middleware.RequiredRole("farmer")(
+            http.HandlerFunc(listingHandler.CreateListing),
+        ),
+    ),
+).Methods("POST")
+
+router.Handle("/api/listings",
+    middleware.AuthMiddleware(cfg.JWTSecret)(
+        http.HandlerFunc(listingHandler.GetListings),
+    ),
+).Methods("GET")
+
+router.Handle("/api/listings/{id}",
+    middleware.AuthMiddleware(cfg.JWTSecret)(
+        http.HandlerFunc(listingHandler.GetListing),
+    ),
+).Methods("GET")
+
+router.Handle("/api/listings/{id}",
+    middleware.AuthMiddleware(cfg.JWTSecret)(
+        middleware.RequiredRole("farmer")(
+            http.HandlerFunc(listingHandler.UpdateListing),
+        ),
+    ),
+).Methods("PUT")
+
+router.Handle("/api/listings/{id}",
+    middleware.AuthMiddleware(cfg.JWTSecret)(
+        middleware.RequiredRole("farmer")(
+            http.HandlerFunc(listingHandler.DeleteListing),
+        ),
+    ),
+).Methods("DELETE")
+
+// Messages — all authenticated users can send and read
+router.Handle("/api/listings/{id}/messages",
+    middleware.AuthMiddleware(cfg.JWTSecret)(
+        http.HandlerFunc(messageHandler.SendMessage),
+    ),
+).Methods("POST")
+
+router.Handle("/api/listings/{id}/messages",
+    middleware.AuthMiddleware(cfg.JWTSecret)(
+        http.HandlerFunc(messageHandler.GetMessages),
     ),
 ).Methods("GET")
 
