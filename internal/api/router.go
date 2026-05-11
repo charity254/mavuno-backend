@@ -360,6 +360,42 @@ router.Handle("/api/listings/{id}/messages",
     ),
 ).Methods("GET")
 
+// ── Article Routes ────────────────────────────────────────────
+articleRepo := storage.NewArticleRepository(db)
+articleService := services.NewArticleService(articleRepo)
+articleHandler := NewArticleHandler(articleService)
+
+// Create — farmer only
+router.Handle("/api/articles",
+    middleware.AuthMiddleware(cfg.JWTSecret)(
+        middleware.RequiredRole("farmer")(
+            http.HandlerFunc(articleHandler.CreateArticle),
+        ),
+    ),
+).Methods("POST")
+
+// Read — all authenticated users
+router.Handle("/api/articles",
+    middleware.AuthMiddleware(cfg.JWTSecret)(
+        http.HandlerFunc(articleHandler.GetArticles),
+    ),
+).Methods("GET")
+
+router.Handle("/api/articles/{id}",
+    middleware.AuthMiddleware(cfg.JWTSecret)(
+        http.HandlerFunc(articleHandler.GetArticle),
+    ),
+).Methods("GET")
+
+// Delete — author only
+router.Handle("/api/articles/{id}",
+    middleware.AuthMiddleware(cfg.JWTSecret)(
+        middleware.RequiredRole("farmer")(
+            http.HandlerFunc(articleHandler.DeleteArticle),
+        ),
+    ),
+).Methods("DELETE")
+
 return router
 }
 
